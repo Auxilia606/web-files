@@ -73,7 +73,7 @@ exports.login = async (req, res) => {
         sameSite: "Strict", // 또는 'Lax' (CSRF 방어용)
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7일
       })
-      .json({ accessToken });
+      .json({ message: "로그인 성공", result: { accessToken } });
   } catch {
     res.status(500).json({ message: "로그인 실패" });
   }
@@ -83,15 +83,18 @@ exports.login = async (req, res) => {
 exports.refreshToken = (req, res) => {
   const token = req.cookies.refreshToken;
   if (!token) {
-    return res.status(401).json({ message: "Refresh Token missing" });
+    return res.status(401).json({ message: "리프레시 토큰을 전달해주세요." });
   }
 
   try {
     const user = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
     const newAccessToken = generateAccessToken(user);
-    res.json({ accessToken: newAccessToken });
+    res.json({
+      message: "토큰 발급 성공",
+      result: { accessToken: newAccessToken },
+    });
   } catch {
-    return res.status(403).json({ message: "Invalid Refresh Token" });
+    return res.status(403).json({ message: "유효하지 않은 토큰" });
   }
 };
 

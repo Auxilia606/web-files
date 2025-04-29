@@ -3,6 +3,10 @@ type ReqDTO = {
   password: string;
 };
 
+type ResDTO = {
+  message: string;
+};
+
 async function POST(body: ReqDTO) {
   const res = await fetch("/api/auth/register", {
     method: "POST",
@@ -11,9 +15,13 @@ async function POST(body: ReqDTO) {
       "Content-Type": "application/json",
     },
   });
-  const data = await res.json();
+  const data: ResDTO = await res.json();
 
-  return Response.json({ data });
+  if (res.ok) {
+    return data;
+  } else {
+    throw new Error(data.message);
+  }
 }
 
 export const authRegisterApi = {

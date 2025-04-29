@@ -5,16 +5,23 @@ import { useMutation } from "@tanstack/react-query";
 import { authLoginApi } from "shared/api/auth/login/route";
 
 const Login = () => {
-  const { handleSubmit, control } =
+  const { handleSubmit, control, setError } =
     useForm<Parameters<typeof authLoginApi.POST>[0]>();
   const { mutate } = useMutation({
     mutationFn: authLoginApi.POST,
+    onSuccess: (data) => {
+      sessionStorage.setItem("access-token", data.result.accessToken);
+    },
+    onError: (data) => {
+      setError("email", { message: data.message });
+      setError("password", { message: data.message });
+    },
   });
 
   return (
     <Stack flex={1} justifyContent="center" alignItems="center">
       <Stack
-        gap="24px"
+        gap="40px"
         sx={{
           width: "400px",
           borderRadius: "12px",

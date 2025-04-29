@@ -1,22 +1,16 @@
-type ReqDTO = {
-  email: string;
-  password: string;
-};
-
 type ResDTO = {
   message: string;
   result: { accessToken: string };
 };
 
-async function POST(body: ReqDTO) {
-  const res = await fetch("/api/auth/login", {
+async function POST() {
+  const res = await fetch("/api/auth/refresh-token", {
     method: "POST",
-    body: JSON.stringify(body),
     headers: {
       "Content-Type": "application/json",
     },
+    credentials: "include",
   });
-
   const data: ResDTO = await res.json();
 
   if (res.ok) {
@@ -26,6 +20,6 @@ async function POST(body: ReqDTO) {
   }
 }
 
-export const authLoginApi = {
+export const authRefreshTokenApi = {
   POST,
 };
