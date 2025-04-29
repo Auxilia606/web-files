@@ -9,6 +9,9 @@ const swaggerSpec = require("./swagger");
 
 const app = express();
 
+const cookieParser = require("cookie-parser");
+app.use(cookieParser());
+
 app.use(express.json());
 
 // Swagger UI

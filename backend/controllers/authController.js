@@ -28,8 +28,7 @@ exports.register = async (req, res) => {
     ]);
 
     res.status(201).json({ message: "회원가입 성공" });
-  } catch (error) {
-    console.error(error);
+  } catch {
     res.status(500).json({ message: "회원가입 실패" });
   }
 };
@@ -67,43 +66,32 @@ exports.login = async (req, res) => {
       user.id,
     ]);
 
-    res.json({ accessToken, refreshToken });
-  } catch (error) {
-    console.error(error);
+    res
+      .cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production", // 프로덕션에서는 https만
+        sameSite: "Strict", // 또는 'Lax' (CSRF 방어용)
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7일
+      })
+      .json({ accessToken });
+  } catch {
     res.status(500).json({ message: "로그인 실패" });
   }
 };
 
 // Refresh Token으로 Access Token 재발급
-exports.refreshToken = async (req, res) => {
-  const { refreshToken } = req.body;
-
-  if (!refreshToken) {
-    return res.status(401).json({ message: "Refresh Token이 필요합니다." });
+exports.refreshToken = (req, res) => {
+  const token = req.cookies.refreshToken;
+  if (!token) {
+    return res.status(401).json({ message: "Refresh Token missing" });
   }
 
   try {
-    const [users] = await db.execute(
-      "SELECT * FROM users WHERE refresh_token = ?",
-      [refreshToken]
-    );
-
-    if (users.length === 0) {
-      return res
-        .status(403)
-        .json({ message: "Refresh Token이 유효하지 않습니다." });
-    }
-
-    const user = users[0];
-
-    // Refresh Token 검증
-    jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
-
-    const newAccessToken = generateAccessToken(user.id);
+    const user = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
+    const newAccessToken = generateAccessToken(user);
     res.json({ accessToken: newAccessToken });
-  } catch (error) {
-    console.error(error);
-    res.status(403).json({ message: "Refresh Token 검증 실패" });
+  } catch {
+    return res.status(403).json({ message: "Invalid Refresh Token" });
   }
 };
 
@@ -119,8 +107,7 @@ exports.logout = async (req, res) => {
     );
 
     res.json({ message: "로그아웃 성공" });
-  } catch (error) {
-    console.error(error);
+  } catch {
     res.status(500).json({ message: "로그아웃 실패" });
   }
 };

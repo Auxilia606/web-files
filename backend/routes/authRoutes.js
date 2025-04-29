@@ -76,17 +76,6 @@ router.post("/login", authController.login);
  *   post:
  *     summary: Refresh Token으로 Access Token 재발급
  *     tags: [Auth]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - refreshToken
- *             properties:
- *               refreshToken:
- *                 type: string
  *     responses:
  *       200:
  *         description: 새로운 Access Token 반환
