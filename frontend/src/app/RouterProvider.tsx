@@ -1,18 +1,31 @@
-import { BrowserRouter, Navigate, Route, Routes } from "react-router";
+import {
+  createBrowserRouter,
+  Navigate,
+  RouterProvider as ReactRouterProvider,
+} from "react-router";
 
 import Login from "@pages/Login";
 import Main from "@pages/Main";
 
 function RouterProvider() {
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Main />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="*" element={<Navigate to="/" />} />
-      </Routes>
-    </BrowserRouter>
-  );
+  return <ReactRouterProvider router={router} />;
 }
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Main />,
+    loader: Main.loader,
+  },
+  {
+    path: "/login",
+    element: <Login />,
+    loader: Login.loader,
+  },
+  {
+    path: "*",
+    element: <Navigate to="/" />,
+  },
+]);
 
 export default RouterProvider;

@@ -1,16 +1,19 @@
 import { Controller, useForm } from "react-hook-form";
+import { redirect, useNavigate } from "react-router-dom";
 import { Button, Stack, TextField, Typography } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 
 import { authLoginApi } from "shared/api/auth/login/route";
 
-const Login = () => {
+const LoginPage = () => {
+  const navigate = useNavigate();
   const { handleSubmit, control, setError } =
     useForm<Parameters<typeof authLoginApi.POST>[0]>();
   const { mutate } = useMutation({
     mutationFn: authLoginApi.POST,
     onSuccess: (data) => {
       sessionStorage.setItem("access-token", data.result.accessToken);
+      navigate("/", { replace: true });
     },
     onError: (data) => {
       setError("email", { message: data.message });
@@ -73,4 +76,16 @@ const Login = () => {
   );
 };
 
+const Login = Object.assign(LoginPage, { loader });
+
 export default Login;
+
+async function loader() {
+  const accessToken = sessionStorage.getItem("access-token");
+
+  if (accessToken) {
+    return redirect("/");
+  }
+
+  return null;
+}
