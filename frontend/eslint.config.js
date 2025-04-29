@@ -42,12 +42,12 @@ export default tseslint.config(
             ],
             // Internal packages.
             [
-              "^@/app",
-              "^@/pages",
-              "^@/widgets",
-              "^@/features",
-              "^@/entities",
-              "^@/shared",
+              "^@app",
+              "^@pages",
+              "^@widgets",
+              "^@features",
+              "^@entities",
+              "^@shared",
               // Side effect imports.
               "^\\u0000",
               // Parent imports. Put `..` last.

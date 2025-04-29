@@ -1,9 +1,16 @@
 import { redirect } from "react-router-dom";
+import { Stack } from "@mui/material";
+
+import Header from "@widgets/Header";
 
 import { authRefreshTokenApi } from "shared/api/auth/refresh-token/route";
 
 const MainPage = () => {
-  return <div>Main</div>;
+  return (
+    <Stack>
+      <Header />
+    </Stack>
+  );
 };
 
 const Main = Object.assign(MainPage, { loader });
