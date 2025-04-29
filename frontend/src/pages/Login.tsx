@@ -7,8 +7,14 @@ import { authLoginApi } from "shared/api/auth/login/route";
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const { handleSubmit, control, setError } =
-    useForm<Parameters<typeof authLoginApi.POST>[0]>();
+  const { handleSubmit, control, setError } = useForm<
+    Parameters<typeof authLoginApi.POST>[0]
+  >({
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
   const { mutate } = useMutation({
     mutationFn: authLoginApi.POST,
     onSuccess: (data) => {
@@ -50,6 +56,7 @@ const LoginPage = () => {
               helperText={fieldState.error?.message}
               label="아이디"
               placeholder="아이디를 입력해주세요."
+              autoComplete="email"
             />
           )}
         />
@@ -65,12 +72,15 @@ const LoginPage = () => {
               label="비밀번호"
               placeholder="비밀번호를 입력해주세요."
               type="password"
+              autoComplete="current-password"
             />
           )}
         />
-        <Button variant="contained" size="large" type="submit">
-          로그인
-        </Button>
+        <Stack>
+          <Button variant="contained" size="large" type="submit">
+            로그인
+          </Button>
+        </Stack>
       </Stack>
     </Stack>
   );
