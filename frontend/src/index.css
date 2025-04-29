@@ -1,5 +1,5 @@
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: "Roboto", system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
@@ -24,4 +24,11 @@ body {
   flex-direction: column;
   min-width: 320px;
   min-height: 100vh;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+
+  flex: 1;
 }
