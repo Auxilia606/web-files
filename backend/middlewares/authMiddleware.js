@@ -14,6 +14,7 @@ exports.protect = (req, res, next) => {
     req.user = decoded; // 디코드된 사용자 정보 저장
     next();
   } catch (error) {
+    console.error(error);
     return res.status(401).json({ message: "유효하지 않은 토큰입니다." });
   }
 };

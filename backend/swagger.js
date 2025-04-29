@@ -5,9 +5,9 @@ const options = {
   definition: {
     openapi: "3.0.0",
     info: {
-      title: "Express + MySQL + JWT API",
-      version: "1.0.0",
-      description: "빠른 인증 API 서버",
+      title: "Web Files API",
+      version: "0.0.0",
+      description: "",
     },
     servers: [
       {
