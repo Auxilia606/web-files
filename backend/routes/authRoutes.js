@@ -40,6 +40,8 @@ const { protect } = require("../middlewares/authMiddleware");
  */
 router.post("/register", authController.register);
 
+router.post("/check-id", authController.checkId);
+
 /**
  * @swagger
  * /api/auth/login:

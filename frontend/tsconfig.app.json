@@ -20,7 +20,8 @@
       "@app/*": ["./app/*"],
       "@pages/*": ["./pages/*"],
       "@widgets/*": ["./widgets/*"],
-      "@entities/*": ["./entities/*"]
+      "@entities/*": ["./entities/*"],
+      "@shared/*": ["./shared/*"]
     },
 
     /* Linting */

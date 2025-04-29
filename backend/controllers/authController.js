@@ -33,6 +33,29 @@ exports.register = async (req, res) => {
   }
 };
 
+// 아이디 중복 확인
+exports.checkId = async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ message: "이메일을 입력해주세요" });
+  }
+
+  try {
+    const [rows] = await db.execute("SELECT id FROM users WHERE email = ?", [
+      email,
+    ]);
+
+    if (rows.length > 0) {
+      return res.status(409).json({ message: "이미 존재하는 이메일입니다." });
+    }
+
+    return res.status(200).json({ message: "사용 가능한 이메일입니다." });
+  } catch {
+    res.status(500).json({ message: "이메일 확인 실패" });
+  }
+};
+
 // 로그인
 exports.login = async (req, res) => {
   const { email, password } = req.body;

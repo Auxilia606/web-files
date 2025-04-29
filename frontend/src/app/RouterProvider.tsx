@@ -6,6 +6,7 @@ import {
 
 import Login from "@pages/Login";
 import Main from "@pages/Main";
+import Signup from "@pages/Signup";
 
 function RouterProvider() {
   return <ReactRouterProvider router={router} />;
@@ -24,6 +25,7 @@ const router = createBrowserRouter([
     loader: Login.loader,
     hydrateFallbackElement: <></>,
   },
+  { path: "/signup", element: <Signup /> },
   {
     path: "*",
     element: <Navigate to="/" />,

@@ -1,5 +1,5 @@
 import { Controller, useForm } from "react-hook-form";
-import { redirect, useNavigate } from "react-router-dom";
+import { NavLink, redirect, useNavigate } from "react-router";
 import { Button, Stack, TextField, Typography } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 
@@ -76,10 +76,17 @@ const LoginPage = () => {
             />
           )}
         />
-        <Stack>
+        <Stack gap="16px">
           <Button variant="contained" size="large" type="submit">
             로그인
           </Button>
+          <Stack direction="row" justifyContent="center">
+            <NavLink to="/signup">
+              <Typography component="span" color="primary">
+                회원가입
+              </Typography>
+            </NavLink>
+          </Stack>
         </Stack>
       </Stack>
     </Stack>
