@@ -1,3 +1,4 @@
+const path = require("path");
 const express = require("express");
 const dotenv = require("dotenv");
 dotenv.config();
@@ -15,6 +16,14 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // API Routes
 app.use("/api/auth", authRoutes);
+
+// 정적 파일 서빙
+app.use(express.static(path.join(__dirname, "../frontend/dist")));
+
+// 모든 요청을 index.html로 리다이렉트 (SPA 대응)
+app.get("*all", (req, res) => {
+  res.sendFile(path.join(__dirname, "../frontend/dist", "index.html"));
+});
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
