@@ -23,15 +23,19 @@ const { protect } = require("../middlewares/authMiddleware");
  *           schema:
  *             type: object
  *             required:
- *               - email
+ *               - loginId
  *               - password
+ *               - nickname
  *             properties:
- *               email:
+ *               loginId:
  *                 type: string
- *                 example: test@gmail.com
+ *                 example: test
  *               password:
  *                 type: string
  *                 example: test1234!
+ *               nickname:
+ *                 type: string
+ *                 example: 테스트
  *     responses:
  *       201:
  *         description: 회원가입 성공
@@ -55,15 +59,15 @@ router.post("/check-id", authController.checkId);
  *           schema:
  *             type: object
  *             required:
- *               - email
+ *               - loginId
  *               - password
  *             properties:
- *               email:
+ *               loginId:
  *                 type: string
- *                 example: test@gmail.com
+ *                 example: test
  *               password:
  *                 type: string
- *                 example: test!23
+ *                 example: test1234!
  *     responses:
  *       200:
  *         description: 로그인 성공 (AccessToken, RefreshToken 반환)
