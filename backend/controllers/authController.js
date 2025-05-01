@@ -52,7 +52,7 @@ exports.checkId = async (req, res) => {
   }
 
   try {
-    const [rows] = await db.execute("SELECT id FROM users WHERE loginId = ?", [
+    const [rows] = await db.execute("SELECT id FROM users WHERE login_id = ?", [
       loginId,
     ]);
 
@@ -71,7 +71,7 @@ exports.login = async (req, res) => {
   const { loginId, password } = req.body;
 
   try {
-    const [users] = await db.execute("SELECT * FROM users WHERE loginId = ?", [
+    const [users] = await db.execute("SELECT * FROM users WHERE login_id = ?", [
       loginId,
     ]);
 
@@ -107,7 +107,8 @@ exports.login = async (req, res) => {
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7일
       })
       .json({ message: "로그인 성공", result: { accessToken } });
-  } catch {
+  } catch (e) {
+    console.error(e);
     res.status(500).json({ message: "로그인 실패" });
   }
 };
