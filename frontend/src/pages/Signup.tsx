@@ -1,6 +1,13 @@
 import { Controller, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import { Button, Stack, TextField, Typography } from "@mui/material";
+import {
+  Button,
+  Stack,
+  TextField,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 
 import Modal from "@entities/Modal";
@@ -45,15 +52,18 @@ const Signup = () => {
     },
   });
 
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
   return (
     <Stack flex={1} justifyContent="center" alignItems="center">
       <Stack
-        gap="40px"
+        gap={isMobile ? "24px" : "40px"}
         sx={{
-          width: "400px",
           borderRadius: "12px",
           boxShadow: "2px 5px 13px 3px rgba(0,0,0,0.25)",
-          padding: "40px",
+          width: isMobile ? "320px" : "600px",
+          padding: isMobile ? "24px" : "40px",
         }}
         component="form"
         onSubmit={handleSubmit((data) => {
@@ -91,6 +101,7 @@ const Signup = () => {
               helperText={fieldState.error?.message}
               label="아이디(이메일)"
               placeholder="아이디를 입력해주세요."
+              size={isMobile ? "small" : "medium"}
             />
           )}
         />
@@ -119,6 +130,7 @@ const Signup = () => {
               label="비밀번호"
               placeholder="비밀번호를 입력해주세요."
               type="password"
+              size={isMobile ? "small" : "medium"}
             />
           )}
         />
@@ -150,6 +162,7 @@ const Signup = () => {
               label="비밀번호 확인"
               placeholder="비밀번호를 다시 입력해주세요."
               type="password"
+              size={isMobile ? "small" : "medium"}
             />
           )}
         />

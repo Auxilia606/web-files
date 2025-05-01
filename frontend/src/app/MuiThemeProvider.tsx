@@ -9,13 +9,13 @@ const theme = createTheme({
   components: {
     MuiTextField: {
       styleOverrides: {
-        root: {
+        root: () => ({
           ".MuiFormHelperText-root": {
             position: "absolute",
             bottom: -2,
             transform: "translate(0, 100%)",
           },
-        },
+        }),
       },
     },
     MuiFormControl: {

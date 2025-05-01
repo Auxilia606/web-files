@@ -31,7 +31,7 @@ const { protect } = require("../middlewares/authMiddleware");
  *                 example: test@gmail.com
  *               password:
  *                 type: string
- *                 example: test!23
+ *                 example: test1234!
  *     responses:
  *       201:
  *         description: 회원가입 성공

@@ -1,6 +1,13 @@
 import { Controller, useForm } from "react-hook-form";
 import { NavLink, redirect, useNavigate } from "react-router";
-import { Button, Stack, TextField, Typography } from "@mui/material";
+import {
+  Button,
+  Stack,
+  TextField,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 
 import { authLoginApi } from "shared/api/auth/login/route";
@@ -27,16 +34,23 @@ const LoginPage = () => {
     },
   });
 
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
   return (
     <Stack flex={1} justifyContent="center" alignItems="center">
       <Stack
         gap="40px"
-        sx={{
-          width: "400px",
+        sx={({ breakpoints }) => ({
           borderRadius: "12px",
           boxShadow: "2px 5px 13px 3px rgba(0,0,0,0.25)",
+          width: "600px",
           padding: "40px",
-        }}
+          [breakpoints.down("sm")]: {
+            width: "320px",
+            padding: "24px",
+          },
+        })}
         component="form"
         onSubmit={handleSubmit((data) => {
           mutate(data);
@@ -52,6 +66,7 @@ const LoginPage = () => {
           render={({ field, fieldState }) => (
             <TextField
               {...field}
+              size={isMobile ? "small" : "medium"}
               error={!!fieldState.error}
               helperText={fieldState.error?.message}
               label="아이디"
@@ -67,6 +82,7 @@ const LoginPage = () => {
           render={({ field, fieldState }) => (
             <TextField
               {...field}
+              size={isMobile ? "small" : "medium"}
               error={!!fieldState.error}
               helperText={fieldState.error?.message}
               label="비밀번호"
