@@ -17,15 +17,25 @@ const generateRefreshToken = (userId) => {
 
 // 회원가입
 exports.register = async (req, res) => {
-  const { loginId, password } = req.body;
+  const { loginId, password, nickname } = req.body;
+
+  if (!loginId) {
+    return res.status(400).json({ message: "아이디를 입력해주세요" });
+  }
+  if (!password) {
+    return res.status(400).json({ message: "비밀번호를 입력해주세요" });
+  }
+  if (!nickname) {
+    return res.status(400).json({ message: "닉네임을 입력해주세요" });
+  }
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    await db.execute("INSERT INTO users (login_id, password) VALUES (?, ?)", [
-      loginId,
-      hashedPassword,
-    ]);
+    await db.execute(
+      "INSERT INTO users (login_id, password, nickname) VALUES (?, ?, ?)",
+      [loginId, hashedPassword, nickname]
+    );
 
     res.status(201).json({ message: "회원가입 성공" });
   } catch {
