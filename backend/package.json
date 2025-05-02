@@ -7,6 +7,7 @@
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "server": "nodemon app.js",
     "client": "npm --prefix ../frontend run dev",
+    "client:build": "npm --prefix ../frontend run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
