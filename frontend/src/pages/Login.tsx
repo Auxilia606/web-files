@@ -18,7 +18,7 @@ const LoginPage = () => {
     Parameters<typeof authLoginApi.POST>[0]
   >({
     defaultValues: {
-      email: "",
+      loginId: "",
       password: "",
     },
   });
@@ -29,7 +29,7 @@ const LoginPage = () => {
       navigate("/", { replace: true });
     },
     onError: (data) => {
-      setError("email", { message: data.message });
+      setError("loginId", { message: data.message });
       setError("password", { message: data.message });
     },
   });
@@ -61,7 +61,7 @@ const LoginPage = () => {
         </Typography>
         <Controller
           control={control}
-          name="email"
+          name="loginId"
           rules={{ required: "아이디를 입력해주세요." }}
           render={({ field, fieldState }) => (
             <TextField

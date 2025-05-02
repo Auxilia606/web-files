@@ -1,6 +1,7 @@
 type ReqDTO = {
-  email: string;
+  loginId: string;
   password: string;
+  nickname: string;
 };
 
 type ResDTO = {

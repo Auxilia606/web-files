@@ -24,7 +24,7 @@ const Signup = () => {
     }
   >({
     defaultValues: {
-      email: "",
+      loginId: "",
       password: "",
       passwordCheck: "",
     },
@@ -67,7 +67,11 @@ const Signup = () => {
         }}
         component="form"
         onSubmit={handleSubmit((data) => {
-          mutateRegister({ email: data.email, password: data.password });
+          mutateRegister({
+            loginId: data.loginId,
+            password: data.password,
+            nickname: data.nickname,
+          });
         })}
       >
         <Typography textAlign="center" fontWeight={700} fontSize="2rem">
@@ -75,22 +79,20 @@ const Signup = () => {
         </Typography>
         <Controller
           control={control}
-          name="email"
+          name="loginId"
           rules={{
             required: "아이디를 입력해주세요.",
             validate: async (value) => {
-              if (
-                /^[a-zA-Z0-9+-_.]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/.test(value)
-              ) {
+              if (/^[a-z][a-z0-9]{3,19}$/.test(value)) {
                 try {
-                  await authCheckIdApi.POST({ email: value });
+                  await authCheckIdApi.POST({ loginId: value });
 
                   return true;
                 } catch (error) {
                   return (error as Error).message;
                 }
               } else {
-                return "이메일 형식을 확인해주세요.";
+                return "4자 이상 20자 이하, 영소문자와 숫자를 조합해주세요";
               }
             },
           }}
@@ -99,7 +101,7 @@ const Signup = () => {
               {...field}
               error={!!fieldState.error}
               helperText={fieldState.error?.message}
-              label="아이디(이메일)"
+              label="아이디"
               placeholder="아이디를 입력해주세요."
               size={isMobile ? "small" : "medium"}
             />
@@ -162,6 +164,23 @@ const Signup = () => {
               label="비밀번호 확인"
               placeholder="비밀번호를 다시 입력해주세요."
               type="password"
+              size={isMobile ? "small" : "medium"}
+            />
+          )}
+        />
+        <Controller
+          control={control}
+          name="nickname"
+          rules={{
+            required: "닉네임을 입력해주세요.",
+          }}
+          render={({ field, fieldState }) => (
+            <TextField
+              {...field}
+              error={!!fieldState.error}
+              helperText={fieldState.error?.message}
+              label="닉네임"
+              placeholder="닉네임을 입력해주세요."
               size={isMobile ? "small" : "medium"}
             />
           )}
