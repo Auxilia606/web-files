@@ -24,8 +24,7 @@ const LoginPage = () => {
   });
   const { mutate } = useMutation({
     mutationFn: authLoginApi.POST,
-    onSuccess: (data) => {
-      sessionStorage.setItem("access-token", data.result.accessToken);
+    onSuccess: () => {
       navigate("/", { replace: true });
     },
     onError: (data) => {

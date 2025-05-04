@@ -44,7 +44,53 @@ const { protect } = require("../middlewares/authMiddleware");
  */
 router.post("/register", authController.register);
 
+/**
+ * @swagger
+ * /api/auth/check-id:
+ *   post:
+ *     summary: 아이디 중복 체크
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - loginId
+ *             properties:
+ *               loginId:
+ *                 type: string
+ *                 example: test
+ *     responses:
+ *       200:
+ *         description: 사용 가능한 아이디
+ *       400:
+ *         description: 아이디 입력하지 않은 경우
+ *       409:
+ *         description: 아이디 중복
+ *       500:
+ *         description: 서버 오류
+ */
 router.post("/check-id", authController.checkId);
+
+/**
+ * @swagger
+ * /api/auth/check-status:
+ *   get:
+ *     summary: 로그인 상태 확인
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: 로그인 상태 정상
+ *       304:
+ *         description: Access Token 재발급
+ *       401:
+ *         description: 토큰 만료
+ *       500:
+ *         description: 서버 오류
+ */
+router.get("/check-status", authController.checkStatus);
 
 /**
  * @swagger

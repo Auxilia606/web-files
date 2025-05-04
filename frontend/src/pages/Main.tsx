@@ -2,8 +2,7 @@ import { redirect } from "react-router-dom";
 import { Stack } from "@mui/material";
 
 import Header from "@widgets/Header";
-
-import { authRefreshTokenApi } from "shared/api/auth/refresh-token/route";
+import { authCheckStatusApi } from "@shared/api/auth/check-status/route";
 
 const MainPage = () => {
   return (
@@ -18,18 +17,11 @@ const Main = Object.assign(MainPage, { loader });
 export default Main;
 
 async function loader() {
-  const accessToken = sessionStorage.getItem("access-token");
+  try {
+    await authCheckStatusApi.GET();
 
-  if (!accessToken) {
-    try {
-      const { result } = await authRefreshTokenApi.POST();
-
-      sessionStorage.setItem("access-token", result.accessToken);
-      return null;
-    } catch {
-      return redirect("/login");
-    }
+    return null;
+  } catch {
+    return redirect("/login");
   }
-
-  return null;
 }

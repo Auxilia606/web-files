@@ -100,22 +100,87 @@ exports.login = async (req, res) => {
     ]);
 
     res
+      .cookie("accessToken", accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production", // 프로덕션에서는 https만
+        sameSite: "Strict",
+        maxAge: 2 * 60 * 1000,
+      })
       .cookie("refreshToken", refreshToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production", // 프로덕션에서는 https만
         sameSite: "Strict", // 또는 'Lax' (CSRF 방어용)
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7일
       })
-      .json({ message: "로그인 성공", result: { accessToken } });
-  } catch (e) {
-    console.error(e);
+      .json({ message: "로그인 성공" });
+  } catch {
     res.status(500).json({ message: "로그인 실패" });
+  }
+};
+
+exports.checkStatus = (req, res) => {
+  const accessToken = req.cookies.accessToken;
+  const refreshToken = req.cookies.refreshToken;
+
+  if (!refreshToken) {
+    return res.status(401).json({
+      message: "로그인이 필요합니다.",
+      needLogin: true,
+    });
+  }
+
+  try {
+    jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+  } catch {
+    return res.status(401).json({
+      message: "만료된 토큰입니다.",
+      needLogin: true,
+    });
+  }
+
+  const user = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+
+  if (!accessToken) {
+    const newAccessToken = generateAccessToken(user);
+
+    return res
+      .status(200)
+      .cookie("accessToken", newAccessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production", // 프로덕션에서는 https만
+        sameSite: "Strict",
+        maxAge: 2 * 60 * 1000,
+      })
+      .json({
+        message: "정상",
+        needLogin: false,
+      });
+  }
+
+  try {
+    jwt.verify(accessToken, process.env.JWT_SECRET);
+  } catch {
+    const newAccessToken = generateAccessToken(user);
+
+    return res
+      .status(401)
+      .cookie("accessToken", newAccessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production", // 프로덕션에서는 https만
+        sameSite: "Strict",
+        maxAge: 2 * 60 * 1000,
+      })
+      .json({
+        message: "만료된 토큰입니다.",
+        needLogin: true,
+      });
   }
 };
 
 // Refresh Token으로 Access Token 재발급
 exports.refreshToken = (req, res) => {
   const token = req.cookies.refreshToken;
+
   if (!token) {
     return res.status(401).json({ message: "리프레시 토큰을 전달해주세요." });
   }
@@ -123,10 +188,16 @@ exports.refreshToken = (req, res) => {
   try {
     const user = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
     const newAccessToken = generateAccessToken(user);
-    res.json({
-      message: "토큰 발급 성공",
-      result: { accessToken: newAccessToken },
-    });
+    res
+      .cookie("accessToken", newAccessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production", // 프로덕션에서는 https만
+        sameSite: "Strict",
+        maxAge: 2 * 60 * 1000,
+      })
+      .json({
+        message: "토큰 발급 성공",
+      });
   } catch {
     return res.status(403).json({ message: "유효하지 않은 토큰" });
   }
@@ -134,7 +205,7 @@ exports.refreshToken = (req, res) => {
 
 // 로그아웃
 exports.logout = async (req, res) => {
-  const { refreshToken } = req.body;
+  const refreshToken = req.cookies.refreshToken;
 
   try {
     // DB에서 Refresh Token 삭제

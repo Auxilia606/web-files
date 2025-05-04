@@ -1,6 +1,5 @@
 type ResDTO = {
   message: string;
-  result: { accessToken: string };
 };
 
 async function POST() {
