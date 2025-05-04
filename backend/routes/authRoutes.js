@@ -140,17 +140,6 @@ router.post("/refresh-token", authController.refreshToken);
  *   post:
  *     summary: 로그아웃
  *     tags: [Auth]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - refreshToken
- *             properties:
- *               refreshToken:
- *                 type: string
  *     responses:
  *       200:
  *         description: 로그아웃 성공

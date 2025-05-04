@@ -163,7 +163,7 @@ exports.checkStatus = (req, res) => {
     const newAccessToken = generateAccessToken(user);
 
     return res
-      .status(401)
+      .status(200)
       .cookie("accessToken", newAccessToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production", // 프로덕션에서는 https만
@@ -171,8 +171,8 @@ exports.checkStatus = (req, res) => {
         maxAge: 2 * 60 * 1000,
       })
       .json({
-        message: "만료된 토큰입니다.",
-        needLogin: true,
+        message: "토큰 업데이트 완료",
+        needLogin: false,
       });
   }
 };
@@ -214,7 +214,21 @@ exports.logout = async (req, res) => {
       [refreshToken]
     );
 
-    res.json({ message: "로그아웃 성공" });
+    res
+      .clearCookie("accessToken", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production", // 프로덕션에서는 https만
+        sameSite: "Strict",
+        maxAge: 2 * 60 * 1000,
+      })
+      .clearCookie("refreshToken", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production", // 프로덕션에서는 https만
+        sameSite: "Strict", // 또는 'Lax' (CSRF 방어용)
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7일
+      })
+      .status(200)
+      .json({ message: "로그아웃 성공" });
   } catch {
     res.status(500).json({ message: "로그아웃 실패" });
   }
