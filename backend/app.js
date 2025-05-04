@@ -4,6 +4,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 const authRoutes = require("./routes/authRoutes");
+const directoryRoutes = require("./routes/directoryRoutes");
 const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./swagger");
 
@@ -19,6 +20,7 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // API Routes
 app.use("/api/auth", authRoutes);
+app.use("/api/directory", directoryRoutes);
 
 // 정적 파일 서빙
 app.use(express.static(path.join(__dirname, "../frontend/dist")));

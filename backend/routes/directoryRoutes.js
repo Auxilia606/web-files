@@ -1,0 +1,85 @@
+const express = require("express");
+const router = express.Router();
+const directoryController = require("../controllers/directoryController");
+const { protect } = require("../middlewares/authMiddleware");
+
+/**
+ * @swagger
+ * tags:
+ *   name: Directory
+ *   description: 디렉토리 관련 API
+ */
+
+/**
+ * @swagger
+ * /api/directory/create:
+ *   post:
+ *     summary: 디렉토리 생성
+ *     tags: [Directory]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - parentId
+ *               - directoryName
+ *             properties:
+ *               parentId:
+ *                 type: number | null
+ *                 example: null
+ *                 description: root directory는 parent Id null로 보내기
+ *               directoryName:
+ *                 type: string
+ *                 example: 테스트
+ *     responses:
+ *       201:
+ *         description: 디렉토리 생성 성공
+ *       500:
+ *         description: 서버 오류
+ */
+router.post("/create", protect, directoryController.create);
+
+/**
+ * @swagger
+ * /api/directory/{id}/update-name:
+ *   post:
+ *     summary: 디렉토리 이름 변경
+ *     tags: [Directory]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: 디렉토리 ID
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - directoryName
+ *             properties:
+ *               directoryName:
+ *                 type: string
+ *                 example: 테스트
+ *     responses:
+ *       200:
+ *         description: 디렉토리 이름 변경 성공
+ *       400:
+ *         description: 디렉토리 이름 관련 오류
+ *       404:
+ *         description: 해당 디렉토리를 찾을 수 없음
+ *       500:
+ *         description: 서버 오류
+ */
+router.post(
+  "/:id/update-name",
+  protect,
+  directoryController.updateDirectoryName
+);
+
+module.exports = router;
