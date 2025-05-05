@@ -158,8 +158,6 @@ router.post("/logout", authController.logout);
  *       200:
  *         description: 인증된 사용자 정보 반환
  */
-router.get("/me", protect, (req, res) => {
-  res.json({ message: "토큰 인증 성공", userId: req.user.id });
-});
+router.get("/me", protect, authController.me);
 
 module.exports = router;

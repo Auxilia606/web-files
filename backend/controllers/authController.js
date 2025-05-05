@@ -233,3 +233,27 @@ exports.logout = async (req, res) => {
     res.status(500).json({ message: "로그아웃 실패" });
   }
 };
+
+exports.me = async (req, res) => {
+  const id = req.user.id;
+
+  if (!id) {
+    return res.status(401).json({ message: "로그인 정보 없음" });
+  }
+
+  try {
+    const [users] = await db.execute("SELECT * FROM users WHERE id = ?", [id]);
+
+    if (users.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "해당하는 id를 가진 사용자는 없습니다." });
+    }
+
+    return res
+      .status(200)
+      .json({ message: "개인정보 조회 성공", user: users[0] });
+  } catch {
+    return res.status(500).json({ message: "서버 에러" });
+  }
+};
