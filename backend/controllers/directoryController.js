@@ -82,17 +82,48 @@ exports.create = async (req, res) => {
         .json({ message: "동일한 이름의 디렉토리가 존재합니다." });
     }
 
-    const fullPath = await buildFullPath(parentId);
+    const parentPath = await buildFullPath(parentId);
+    const fullPath =
+      parentPath === "/"
+        ? `/${directoryName}`
+        : `${parentPath}/${directoryName}`;
 
     await db.execute(
-      "INSERT INTO directory (parent_id, directory_name, full_path) VALUES (?, ?, ?)",
-      [parentId, directoryName, fullPath]
+      "INSERT INTO directory (parent_id, directory_name, full_path, created_by) VALUES (?, ?, ?, ?)",
+      [parentId, directoryName, fullPath, req.user.id]
     );
 
     return res.status(201).json({ message: "디렉토리 생성 성공" });
   } catch (e) {
     console.log(e);
     return res.status(500).json({ message: "디렉토리 생성 실패" });
+  }
+};
+
+exports.getDirectory = async (req, res) => {
+  const userId = req.user.id;
+  const directoryId = Number(req.params.id);
+
+  try {
+    let query = "";
+    let params = [];
+    if (directoryId !== 0) {
+      query =
+        "SELECT * FROM directory WHERE parent_id = ? AND created_by = ? AND is_private = FALSE";
+      params = [directoryId, userId];
+    } else {
+      query =
+        "SELECT * FROM directory WHERE parent_id IS NULL AND created_by = ? AND is_private = FALSE";
+      params = [userId];
+    }
+    const [rows] = await db.execute(query, params);
+
+    return res
+      .status(200)
+      .json({ message: "디렉토리 조회 성공", directory: rows });
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json({ message: "디렉토리 조회 실패" });
   }
 };
 
