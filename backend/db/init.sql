@@ -23,8 +23,8 @@ CREATE TABLE directory (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     is_deleted BOOLEAN DEFAULT FALSE,
-    created_by BIGINT NULL,
-    is_private tinyint(1) DEFAULT FALSE,
+    created_by BIGINT NULL,  -- 생성자 정보
+    is_private tinyint(1) DEFAULT FALSE, -- 숨김 처리 여부
 
     CONSTRAINT fk_directory_parent
         FOREIGN KEY (parent_id) REFERENCES directory(id)

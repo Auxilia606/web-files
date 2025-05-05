@@ -118,9 +118,20 @@ exports.getDirectory = async (req, res) => {
     }
     const [rows] = await db.execute(query, params);
 
-    return res
-      .status(200)
-      .json({ message: "디렉토리 조회 성공", directory: rows });
+    return res.status(200).json({
+      message: "디렉토리 조회 성공",
+      directory: rows.map((v) => ({
+        id: v.id,
+        parentId: v.parent_id,
+        directoryName: v.directory_name,
+        fullPath: v.full_path,
+        createdAt: v.created_at,
+        updatedAt: v.updated_at,
+        isDeleted: !!v.is_deleted,
+        createdBy: !!v.created_by,
+        isPrivate: !!v.is_private,
+      })),
+    });
   } catch (e) {
     console.log(e);
     return res.status(500).json({ message: "디렉토리 조회 실패" });
