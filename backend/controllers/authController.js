@@ -159,6 +159,7 @@ exports.checkStatus = (req, res) => {
 
   try {
     jwt.verify(accessToken, process.env.JWT_SECRET);
+    return res.status(200).json({ message: "정상" });
   } catch {
     const newAccessToken = generateAccessToken(user);
 

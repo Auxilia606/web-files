@@ -11,6 +11,7 @@ export default defineConfig({
         target: "http://localhost:8000", // server domain
         changeOrigin: true,
         secure: false,
+        ws: true,
       },
     },
   },

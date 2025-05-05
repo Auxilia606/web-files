@@ -4,6 +4,7 @@ import {
   RouterProvider as ReactRouterProvider,
 } from "react-router";
 
+import Explorer from "@pages/Explorer";
 import Login from "@pages/Login";
 import Main from "@pages/Main";
 import Signup from "@pages/Signup";
@@ -18,6 +19,12 @@ const router = createBrowserRouter([
     element: <Main />,
     loader: Main.loader,
     hydrateFallbackElement: <></>,
+    children: [
+      {
+        path: "explorer",
+        element: <Explorer />,
+      },
+    ],
   },
   {
     path: "/login",
