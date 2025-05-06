@@ -4,7 +4,10 @@ const Explorer = () => {
   return (
     <Stack>
       <video width="640" height="360" controls>
-        <source src="/api/video/test.mp4" type="video/mp4" />
+        <source
+          src="http://192.168.55.143:8000/api/video/test.mp4"
+          type="video/mp4"
+        />
         브라우저가 video 태그를 지원하지 않습니다.111
       </video>
     </Stack>

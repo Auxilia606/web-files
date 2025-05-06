@@ -3,9 +3,9 @@ const express = require("express");
 const dotenv = require("dotenv");
 dotenv.config();
 
-const authRoutes = require("./routes/authRoutes");
-const directoryRoutes = require("./routes/directoryRoutes");
-const videoRoutes = require("./routes/videoRoutes");
+const authRoutes = require("./routes/auth.route");
+const directoryRoutes = require("./routes/directory.route");
+const videoRoutes = require("./routes/video.routes");
 const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./swagger");
 
