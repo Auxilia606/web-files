@@ -3,6 +3,6 @@ const videoController = require("../controllers/video.controller");
 
 const router = express.Router();
 
-router.get("/stream/:filename", videoController.streamVideo);
+router.get("/:filename", videoController.streamVideo);
 
 module.exports = router;

@@ -3,11 +3,7 @@ const path = require("path");
 const fs = require("fs");
 
 exports.streamVideo = (req, res) => {
-  const filePath = path.join(
-    __dirname,
-    "../../uploads/videos",
-    req.params.filename
-  );
+  const filePath = path.join(process.env.FILE_LOCATION, req.params.filename);
   const stat = fs.statSync(filePath);
   const fileSize = stat.size;
   const range = req.headers.range;
