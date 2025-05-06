@@ -109,11 +109,11 @@ exports.getDirectory = async (req, res) => {
     let params = [];
     if (directoryId !== 0) {
       query =
-        "SELECT * FROM directory WHERE parent_id = ? AND created_by = ? AND is_private = FALSE";
+        "SELECT * FROM directory WHERE parent_id = ? AND created_by = ? AND is_private = FALSE AND is_deleted = FALSE";
       params = [directoryId, userId];
     } else {
       query =
-        "SELECT * FROM directory WHERE parent_id IS NULL AND created_by = ? AND is_private = FALSE";
+        "SELECT * FROM directory WHERE parent_id IS NULL AND created_by = ? AND is_private = FALSE AND is_deleted = FALSE";
       params = [userId];
     }
     const [rows] = await db.execute(query, params);
@@ -187,5 +187,35 @@ exports.updateDirectoryName = async (req, res) => {
     return res
       .status(500)
       .json({ message: "디렉토리 이름 변경 중 오류가 발생했습니다." });
+  }
+};
+
+exports.deleteDirectory = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // 기존 디렉토리 존재 여부 확인
+    const [rows] = await db.execute("SELECT * FROM directory WHERE id = ?", [
+      id,
+    ]);
+
+    if (rows.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "해당 디렉토리를 찾을 수 없습니다." });
+    }
+
+    // 이름 변경
+    await db.execute("UPDATE directory SET is_deleted = TRUE WHERE id = ?", [
+      id,
+    ]);
+
+    return res.status(200).json({ message: "디렉토리를 삭제했습니다." });
+  } catch (e) {
+    console.log(e);
+
+    return res
+      .status(500)
+      .json({ message: "디렉토리 삭제 중 오류가 발생했습니다." });
   }
 };

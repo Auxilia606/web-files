@@ -106,4 +106,29 @@ router.put(
   directoryController.updateDirectoryName
 );
 
+/**
+ * @swagger
+ * /api/directory/{id}:
+ *   delete:
+ *     summary: 디렉토리 삭제
+ *     tags: [Directory]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: 디렉토리 ID
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: 디렉토리 삭제 성공
+ *       400:
+ *         description: 디렉토리 관련 오류
+ *       404:
+ *         description: 해당 디렉토리를 찾을 수 없음
+ *       500:
+ *         description: 서버 오류
+ */
+router.delete("/:id", protect, directoryController.deleteDirectory);
+
 module.exports = router;
