@@ -5,6 +5,7 @@ dotenv.config();
 
 const authRoutes = require("./routes/auth.route");
 const directoryRoutes = require("./routes/directory.route");
+const fileInfoRoutes = require("./routes/fileInfo.route");
 const videoRoutes = require("./routes/video.routes");
 const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./swagger");
@@ -22,6 +23,7 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 // API Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/directory", directoryRoutes);
+app.use("/api/file-info", fileInfoRoutes);
 app.use("/api/video", videoRoutes);
 
 // 정적 파일 서빙

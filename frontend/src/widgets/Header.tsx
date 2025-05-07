@@ -1,4 +1,4 @@
-import React, { Fragment, useLayoutEffect, useRef, useState } from "react";
+import React, { useLayoutEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router";
 import {
@@ -22,6 +22,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { directoryDetailApi } from "@shared/api/directory/[id]/detail/route";
 import { directoryApi } from "@shared/api/directory/[id]/route";
 import { directoryCreateApi } from "@shared/api/directory/create/route";
+import { fileUploadApi } from "@shared/api/file-info/upload/route";
 
 const Header = () => {
   const params = useParams<{ directoryId: string }>();
@@ -200,20 +201,35 @@ const CreateNewDirectoryButton = (props: Pick<IconButtonProps, "onClick">) => {
  * 이미지 또는 영상 추가하기
  */
 const FileAddButton = () => {
+  const params = useParams<{ directoryId: string }>();
+
+  const directoryId = Number(params.directoryId);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   return (
-    <Fragment>
-      {/* 이미지 또는 영상 추가 */}
-      <input hidden multiple type="file" accept="image/*" ref={fileInputRef} />
-      <IconButton
-        onClick={() => {
-          fileInputRef.current?.click();
+    <IconButton
+      onClick={() => {
+        fileInputRef.current?.click();
+      }}
+    >
+      <AddPhotoAlternateOutlined />
+      <input
+        hidden
+        multiple
+        type="file"
+        accept="image/*"
+        ref={fileInputRef}
+        onChange={(event) => {
+          if (!event.target.files) return;
+
+          fileUploadApi.POST({
+            file: event.target.files[0],
+            directoryId,
+          });
         }}
-      >
-        <AddPhotoAlternateOutlined />
-      </IconButton>
-    </Fragment>
+      />
+    </IconButton>
   );
 };
 
