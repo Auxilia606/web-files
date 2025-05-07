@@ -1,0 +1,34 @@
+import { ApiResponse } from "@shared/types";
+
+async function GET(params: { directoryId: number }) {
+  const res = await fetch(`/api/directory/${params.directoryId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+  });
+  const data: ApiResponse<{
+    directory: {
+      id: number;
+      parentId: number;
+      directoryName: string;
+      fullPath: string;
+      createdAt: string;
+      updatedAt: string;
+      isDeleted: boolean;
+      createdBy: boolean;
+      isPrivate: boolean;
+    }[];
+  }> = await res.json();
+
+  if (res.ok) {
+    return data;
+  } else {
+    throw new Error(data.message);
+  }
+}
+
+export const directoryApi = {
+  GET,
+};

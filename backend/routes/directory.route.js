@@ -55,15 +55,39 @@ router.post("/create", protect, directoryController.create);
  *           type: integer
  *     responses:
  *       200:
- *         description: 디렉토리 이름 변경 성공
+ *         description: 디렉토리 조회 성공
  *       400:
- *         description: 디렉토리 이름 관련 오류
+ *         description: 디렉토리 조회 관련 오류
  *       404:
  *         description: 해당 디렉토리를 찾을 수 없음
  *       500:
  *         description: 서버 오류
  */
 router.get("/:id", protect, directoryController.getDirectory);
+
+/**
+ * @swagger
+ * /api/directory/{id}/detail:
+ *   get:
+ *     summary: 디렉토리 상세 조회
+ *     tags: [Directory]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         description: 디렉토리 ID, root를 조회할 때에는 0 입력
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: 디렉토리 상세 조회 성공
+ *       400:
+ *         description: 디렉토리 아이디 필요
+ *       404:
+ *         description: 해당 디렉토리를 찾을 수 없음
+ *       500:
+ *         description: 서버 오류
+ */
+router.get("/:id/detail", protect, directoryController.getDirectoryDetail);
 
 /**
  * @swagger

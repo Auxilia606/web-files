@@ -20,8 +20,9 @@ const router = createBrowserRouter([
     loader: Main.loader,
     hydrateFallbackElement: <></>,
     children: [
+      { path: "", element: <Navigate to="/explorer/0" replace /> },
       {
-        path: "explorer",
+        path: "explorer/:directoryId",
         element: <Explorer />,
       },
     ],

@@ -104,7 +104,7 @@ exports.login = async (req, res) => {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production", // 프로덕션에서는 https만
         sameSite: "Strict",
-        maxAge: 2 * 60 * 1000,
+        maxAge: 2 * 60 * 60 * 1000,
       })
       .cookie("refreshToken", refreshToken, {
         httpOnly: true,

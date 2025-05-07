@@ -88,12 +88,14 @@ exports.create = async (req, res) => {
         ? `/${directoryName}`
         : `${parentPath}/${directoryName}`;
 
-    await db.execute(
+    const result = await db.execute(
       "INSERT INTO directory (parent_id, directory_name, full_path, created_by) VALUES (?, ?, ?, ?)",
       [parentId, directoryName, fullPath, req.user.id]
     );
 
-    return res.status(201).json({ message: "디렉토리 생성 성공" });
+    return res
+      .status(201)
+      .json({ message: "디렉토리 생성 성공", directoryId: result[0].insertId });
   } catch (e) {
     console.log(e);
     return res.status(500).json({ message: "디렉토리 생성 실패" });
@@ -135,6 +137,46 @@ exports.getDirectory = async (req, res) => {
   } catch (e) {
     console.log(e);
     return res.status(500).json({ message: "디렉토리 조회 실패" });
+  }
+};
+
+exports.getDirectoryDetail = async (req, res) => {
+  const directoryId = Number(req.params.id);
+
+  try {
+    const query =
+      "SELECT * FROM directory WHERE id = ? AND is_private = FALSE AND is_deleted = FALSE";
+    const params = [directoryId];
+
+    if (!directoryId) {
+      return res.status(400).json({ message: "디렉토리 아이디가 필요합니다." });
+    }
+
+    const [rows] = await db.execute(query, params);
+
+    if (rows.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "해당 디렉토리가 존재하지 않습니다." });
+    }
+
+    return res.status(200).json({
+      message: "디렉토리 상세 조회 성공",
+      directory: rows.map((v) => ({
+        id: v.id,
+        parentId: v.parent_id,
+        directoryName: v.directory_name,
+        fullPath: v.full_path,
+        createdAt: v.created_at,
+        updatedAt: v.updated_at,
+        isDeleted: !!v.is_deleted,
+        createdBy: !!v.created_by,
+        isPrivate: !!v.is_private,
+      }))[0],
+    });
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json({ message: "디렉토리 상세 조회 실패" });
   }
 };
 
