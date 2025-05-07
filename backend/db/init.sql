@@ -50,6 +50,7 @@ CREATE TABLE file_info (
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     is_deleted BOOLEAN DEFAULT FALSE,
     file_hash CHAR(64),                    -- SHA-256 등으로 중복 파일 식별용 (선택)
+    media_created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT fk_file_directory
         FOREIGN KEY (directory_id) REFERENCES directory(id)
