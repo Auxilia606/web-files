@@ -1,8 +1,9 @@
-import React, { useLayoutEffect, useRef, useState } from "react";
+import React, { Fragment, useLayoutEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router";
 import {
   AccountCircleOutlined,
+  AddPhotoAlternateOutlined,
   ArrowBackIosNewOutlined,
   ArrowRightOutlined,
   CreateNewFolderOutlined,
@@ -11,6 +12,7 @@ import {
   Button,
   Drawer,
   IconButton,
+  IconButtonProps,
   Stack,
   TextField,
   Typography,
@@ -23,7 +25,6 @@ import { directoryCreateApi } from "@shared/api/directory/create/route";
 
 const Header = () => {
   const params = useParams<{ directoryId: string }>();
-  const navigate = useNavigate();
 
   const directoryId = Number(params.directoryId);
 
@@ -82,22 +83,10 @@ const Header = () => {
         height="64px"
         sx={{ padding: "0 8px" }}
       >
-        <IconButton
-          onClick={() => {
-            navigate(-1);
-          }}
-        >
-          <ArrowBackIosNewOutlined />
-        </IconButton>
-        <IconButton
-          sx={{ marginLeft: "auto" }}
-          onClick={toggleCreateDrawer(true)}
-        >
-          <CreateNewFolderOutlined />
-        </IconButton>
-        <IconButton>
-          <AccountCircleOutlined />
-        </IconButton>
+        <BackButton />
+        <CreateNewDirectoryButton onClick={toggleCreateDrawer(true)} />
+        <FileAddButton />
+        <AccountButton />
       </Stack>
       <Stack
         direction="row"
@@ -182,6 +171,60 @@ const Header = () => {
         </Stack>
       </Drawer>
     </Stack>
+  );
+};
+
+const BackButton = () => {
+  const navigate = useNavigate();
+
+  return (
+    <IconButton
+      onClick={() => {
+        navigate(-1);
+      }}
+    >
+      <ArrowBackIosNewOutlined />
+    </IconButton>
+  );
+};
+
+const CreateNewDirectoryButton = (props: Pick<IconButtonProps, "onClick">) => {
+  return (
+    <IconButton sx={{ marginLeft: "auto" }} onClick={props.onClick}>
+      <CreateNewFolderOutlined />
+    </IconButton>
+  );
+};
+
+/**
+ * 이미지 또는 영상 추가하기
+ */
+const FileAddButton = () => {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  return (
+    <Fragment>
+      {/* 이미지 또는 영상 추가 */}
+      <input hidden multiple type="file" accept="image/*" ref={fileInputRef} />
+      <IconButton
+        onClick={() => {
+          fileInputRef.current?.click();
+        }}
+      >
+        <AddPhotoAlternateOutlined />
+      </IconButton>
+    </Fragment>
+  );
+};
+
+/**
+ * 계정 정보 확인
+ */
+const AccountButton = () => {
+  return (
+    <IconButton>
+      <AccountCircleOutlined />
+    </IconButton>
   );
 };
 
