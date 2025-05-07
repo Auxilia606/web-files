@@ -1,38 +1,68 @@
-import { PropsWithChildren } from "react";
-import { createTheme, ThemeProvider } from "@mui/material";
+import { PropsWithChildren, useMemo } from "react";
+import {
+  createTheme,
+  CssBaseline,
+  ThemeProvider,
+  useMediaQuery,
+} from "@mui/material";
 
 const MuiThemeProvider = (props: PropsWithChildren) => {
-  return <ThemeProvider theme={theme}>{props.children}</ThemeProvider>;
-};
+  const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
 
-const theme = createTheme({
-  components: {
-    MuiTextField: {
-      styleOverrides: {
-        root: () => ({
-          ".MuiFormHelperText-root": {
-            position: "absolute",
-            bottom: -2,
-            transform: "translate(0, 100%)",
+  const theme = useMemo(
+    () =>
+      createTheme({
+        palette: {
+          mode: prefersDarkMode ? "dark" : "light",
+          background: {
+            default: "#121212",
+            paper: "#1E1E1E",
           },
-        }),
-      },
-    },
-    MuiFormControl: {
-      styleOverrides: {
-        root: {
-          position: "relative",
+          primary: {
+            main: "#90caf9",
+          },
+          text: {
+            primary: "#ffffff",
+            secondary: "#aaaaaa",
+          },
         },
-      },
-    },
-    MuiIconButton: {
-      styleOverrides: {
-        root: ({ theme }) => ({
-          color: theme.palette.text.primary,
-        }),
-      },
-    },
-  },
-});
+        components: {
+          MuiTextField: {
+            styleOverrides: {
+              root: () => ({
+                ".MuiFormHelperText-root": {
+                  position: "absolute",
+                  bottom: -2,
+                  transform: "translate(0, 100%)",
+                },
+              }),
+            },
+          },
+          MuiFormControl: {
+            styleOverrides: {
+              root: {
+                position: "relative",
+              },
+            },
+          },
+          MuiIconButton: {
+            styleOverrides: {
+              root: ({ theme }) => ({
+                color: theme.palette.text.primary,
+              }),
+            },
+          },
+        },
+      }),
+    [prefersDarkMode]
+  );
+
+  return (
+    <ThemeProvider theme={theme}>
+      <CssBaseline /> {/* 🌙 다크모드 배경 및 텍스트 색 자동 초기화 */}
+      {props.children}
+    </ThemeProvider>
+  );
+};
 
 export default MuiThemeProvider;
