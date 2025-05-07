@@ -105,6 +105,26 @@ npm run dev
 
 ---
 
+## ✅ 필수 파일 설치
+
+Window Powershell (관리자 권한 실행)
+
+```
+choco install ffmpeg
+```
+
+ffmpeg 직접설치
+
+1. 아래 사이트에서 Windows용 zip 다운로드: 👉 https://www.gyan.dev/ffmpeg/builds/
+
+2. "Release full" 버전 클릭 → ZIP 파일 다운로드
+
+3. 압축 해제 후 폴더(예: ffmpeg-6.1-full_build) 안의 bin 경로 복사
+
+4. 시스템 환경 변수 → Path에 해당 bin 경로 추가
+
+5. 터미널에서 ffmpeg -version 확인
+
 ## ✅ 개발 및 유지보수 참고 사항
 
 - 사용자 인증 기능 없이 시작했다가 후에 추가 가능하도록 유연한 구조 설계
