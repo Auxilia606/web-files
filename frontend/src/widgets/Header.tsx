@@ -177,12 +177,16 @@ const Header = () => {
 
 const BackButton = () => {
   const navigate = useNavigate();
+  const params = useParams<{ directoryId: string }>();
+
+  const directoryId = Number(params.directoryId);
 
   return (
     <IconButton
       onClick={() => {
         navigate(-1);
       }}
+      disabled={!directoryId}
     >
       <ArrowBackIosNewOutlined />
     </IconButton>
@@ -212,13 +216,14 @@ const FileAddButton = () => {
       onClick={() => {
         fileInputRef.current?.click();
       }}
+      disabled={!directoryId}
     >
       <AddPhotoAlternateOutlined />
       <input
         hidden
         multiple
         type="file"
-        accept="image/*"
+        accept="image/*,video/*"
         ref={fileInputRef}
         onChange={(event) => {
           if (!event.target.files) return;

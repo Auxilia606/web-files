@@ -49,6 +49,9 @@ const MuiThemeProvider = (props: PropsWithChildren) => {
             styleOverrides: {
               root: ({ theme }) => ({
                 color: theme.palette.text.primary,
+                "&.Mui-disabled": {
+                  color: theme.palette.text.secondary,
+                },
               }),
             },
           },
