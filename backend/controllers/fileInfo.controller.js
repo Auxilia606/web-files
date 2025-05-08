@@ -52,6 +52,7 @@ exports.uploadFile = async (req, res) => {
       thumbPath = path.join(THUMBNAIL_DIR, `${uniqueName}`);
       try {
         await sharp(targetPath)
+          .rotate()
           .resize(200, 200, { fit: "cover" })
           .toFile(thumbPath);
         // 필요 시 thumbPath를 DB에 추가 가능
@@ -145,5 +146,30 @@ exports.getFiles = async (req, res) => {
     console.error(e);
     result.message = "파일 목록 조회 실패";
     res.status(500).json(result);
+  }
+};
+
+exports.getThumbnail = async (req, res) => {
+  const fileId = Number(req.params.id);
+
+  try {
+    // DB에서 썸네일 경로 조회
+    const [[file]] = await db.execute(
+      `SELECT thumbnail_path FROM file_info WHERE id = ? AND is_deleted = FALSE`,
+      [fileId]
+    );
+
+    if (!file) {
+      return res.status(404).send("파일을 찾을 수 없습니다");
+    }
+
+    if (!fs.existsSync(file.thumbnail_path)) {
+      return res.status(404).send("썸네일이 존재하지 않습니다");
+    }
+
+    res.sendFile(file.thumbnail_path);
+  } catch (e) {
+    console.error(e);
+    res.status(500).send("썸네일 제공 중 오류 발생");
   }
 };

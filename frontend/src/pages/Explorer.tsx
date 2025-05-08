@@ -1,5 +1,5 @@
 import { Link, useLocation, useParams } from "react-router";
-import { FolderOutlined } from "@mui/icons-material";
+import { DriveFolderUploadOutlined, FolderOutlined } from "@mui/icons-material";
 import { Stack, Typography } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 
@@ -51,6 +51,7 @@ const Explorer = () => {
   return (
     <Stack direction="column">
       <DirectoryItem
+        back
         id={directoryDetailData?.directory.parentId || 0}
         directoryName=".."
         updatedAt=""
@@ -70,7 +71,9 @@ type Directory = UnwrapApiResponse<
 >["directory"][number];
 
 const DirectoryItem = (
-  props: Pick<Directory, "id" | "directoryName" | "updatedAt">
+  props: Pick<Directory, "id" | "directoryName" | "updatedAt"> & {
+    back?: boolean;
+  }
 ) => {
   return (
     <Stack
@@ -86,7 +89,11 @@ const DirectoryItem = (
       component={Link}
       to={`/explorer/${props.id}`}
     >
-      <FolderOutlined />
+      {props.back ? (
+        <DriveFolderUploadOutlined sx={{ margin: "0 8px" }} />
+      ) : (
+        <FolderOutlined sx={{ margin: "0 8px" }} />
+      )}
       <Stack direction="column" flex="1">
         <Typography color="textPrimary">{props.directoryName}</Typography>
         <Typography color="textSecondary">
@@ -117,6 +124,11 @@ const FileItem = (props: FileItemProps) => {
         textAlign: "start",
       })}
     >
+      <img
+        src={`/api/file-info/thumbnail/${props.id}`}
+        width={40}
+        height={40}
+      />
       <Stack direction="column" flex="1">
         <Typography color="textPrimary">{props.original_name}</Typography>
         <Typography color="textSecondary">

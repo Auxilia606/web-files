@@ -149,4 +149,47 @@ router.post("/upload", upload.single("file"), fileInfoController.uploadFile);
  */
 router.get("/files", fileInfoController.getFiles);
 
+/**
+ * @swagger
+ * /api/file-info/thumbnail/{id}:
+ *   get:
+ *     summary: 이미지 파일 썸네일 조회
+ *     tags: [File Info]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         description: 파일 ID
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: 썸네일 조회 성공
+ *         content:
+ *           image/*:
+ *             schema:
+ *               type: object
+ *               format: binary
+ *       400:
+ *         description: 요청 오류 (파일 또는 디렉토리 ID 누락)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 파일과 디렉토리 아이디는 필수입니다.
+ *       500:
+ *         description: 서버 오류
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 서버 오류로 파일 조회 실패
+ */
+router.get("/thumbnail/:id", fileInfoController.getThumbnail);
+
 module.exports = router;
