@@ -47,3 +47,22 @@ exports.convertToHLS = (inputPath, outputDir) => {
       .run();
   });
 };
+
+/**
+ * 영상에서 1초 지점 썸네일 이미지 추출
+ * @param {string} videoPath - 원본 영상 경로
+ * @param {string} outputPath - 저장할 썸네일 경로 (jpg)
+ */
+exports.generateVideoThumbnail = (videoPath, outputPath) => {
+  return new Promise((resolve, reject) => {
+    ffmpeg(videoPath)
+      .screenshots({
+        timestamps: ["00:00:01.000"],
+        filename: path.basename(outputPath),
+        folder: path.dirname(outputPath),
+        size: "320x?",
+      })
+      .on("end", resolve)
+      .on("error", reject);
+  });
+};

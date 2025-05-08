@@ -9,6 +9,7 @@ const {
   THUMBNAIL_DIR,
   STREAM_DIR,
 } = require("../config/file-info");
+const { generateVideoThumbnail } = require("../services/video.service");
 
 function convertToHLS(inputPath, outputDir) {
   return new Promise((resolve, reject) => {
@@ -43,7 +44,7 @@ exports.uploadFile = async (req, res) => {
 
     fs.renameSync(file.path, targetPath);
     let storagePath = targetPath;
-    let thumbPath;
+    let thumbPath = null;
 
     // 1️⃣ 이미지 썸네일 생성
     if (file.mimetype.startsWith("image/")) {
@@ -69,6 +70,14 @@ exports.uploadFile = async (req, res) => {
       try {
         await convertToHLS(targetPath, targetStreamDir);
         storagePath = path.join(targetStreamDir, "output.m3u8");
+        // 🎯 동영상 썸네일 생성 (썸네일 1초 지점에서 추출)
+        fs.mkdirSync(THUMBNAIL_DIR, { recursive: true });
+        thumbPath = path.join(THUMBNAIL_DIR, `${uniqueName}.jpg`);
+        try {
+          await generateVideoThumbnail(targetPath, thumbPath);
+        } catch (e) {
+          console.error("비디오 썸네일 생성 실패:", e);
+        }
       } catch (e) {
         console.error("HLS 변환 실패:", e);
         return res.status(500).json({ message: "HLS 변환 실패" });
