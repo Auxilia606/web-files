@@ -17,16 +17,23 @@ const generateRefreshToken = (userId) => {
 
 // 회원가입
 exports.register = async (req, res) => {
+  /** @type {import("././../../types/auth.dto").AuthRegisterReqDTO} */
   const { loginId, password, nickname } = req.body;
 
+  /** @type {import("././../../types/auth.dto").AuthRegisterResDTO} */
+  const result = { message: "" };
+
   if (!loginId) {
-    return res.status(400).json({ message: "아이디를 입력해주세요" });
+    result.message = "아이디를 입력해주세요";
+    return res.status(400).json(result);
   }
   if (!password) {
-    return res.status(400).json({ message: "비밀번호를 입력해주세요" });
+    result.message = "비밀번호를 입력해주세요";
+    return res.status(400).json(result);
   }
   if (!nickname) {
-    return res.status(400).json({ message: "닉네임을 입력해주세요" });
+    result.message = "닉네임을 입력해주세요";
+    return res.status(400).json(result);
   }
 
   try {
@@ -37,9 +44,11 @@ exports.register = async (req, res) => {
       [loginId, hashedPassword, nickname]
     );
 
-    res.status(201).json({ message: "회원가입 성공" });
+    result.message = "회원가입 성공";
+    res.status(201).json(result);
   } catch {
-    res.status(500).json({ message: "회원가입 실패" });
+    result.message = "회원가입 실패";
+    res.status(500).json(result);
   }
 };
 

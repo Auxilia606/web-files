@@ -1,14 +1,6 @@
-type ReqDTO = {
-  loginId: string;
-  password: string;
-  nickname: string;
-};
+import { AuthRegisterReqDTO, AuthRegisterResDTO } from "@dto/auth.dto";
 
-type ResDTO = {
-  message: string;
-};
-
-async function POST(body: ReqDTO) {
+async function POST(body: AuthRegisterReqDTO) {
   const res = await fetch("/api/auth/register", {
     method: "POST",
     body: JSON.stringify(body),
@@ -16,7 +8,7 @@ async function POST(body: ReqDTO) {
       "Content-Type": "application/json",
     },
   });
-  const data: ResDTO = await res.json();
+  const data: AuthRegisterResDTO = await res.json();
 
   if (res.ok) {
     return data;

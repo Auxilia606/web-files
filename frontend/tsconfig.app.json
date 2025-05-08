@@ -21,7 +21,8 @@
       "@pages/*": ["./pages/*"],
       "@widgets/*": ["./widgets/*"],
       "@entities/*": ["./entities/*"],
-      "@shared/*": ["./shared/*"]
+      "@shared/*": ["./shared/*"],
+      "@dto/*": ["../../types/*"]
     },
 
     /* Linting */

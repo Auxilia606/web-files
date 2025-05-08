@@ -48,6 +48,7 @@ export default tseslint.config(
               "^@features",
               "^@entities",
               "^@shared",
+              "^@dto",
               // Side effect imports.
               "^\\u0000",
               // Parent imports. Put `..` last.
