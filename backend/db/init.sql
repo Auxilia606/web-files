@@ -42,6 +42,7 @@ CREATE TABLE file_info (
     file_size BIGINT NOT NULL,             -- 바이트 단위 크기
     mime_type VARCHAR(100),
     storage_path TEXT NOT NULL,            -- 서버 내 물리적 경로
+    thumbnail_path TEXT,                   -- 이미지 썸네일 경로
     uploader_id BIGINT,                    -- 사용자 ID (외래키 연결 가능)
     view_count INT DEFAULT 0,
     download_count INT DEFAULT 0,

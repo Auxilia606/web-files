@@ -72,4 +72,81 @@ const upload = require("../middlewares/upload.middleware");
  */
 router.post("/upload", upload.single("file"), fileInfoController.uploadFile);
 
+/**
+ * @swagger
+ * /api/file-info/files:
+ *   get:
+ *     summary: 디렉토리 내 파일 목록 조회
+ *     tags: [File Info]
+ *     parameters:
+ *       - name: directoryId
+ *         in: query
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: 조회할 디렉토리 ID
+ *       - name: page
+ *         in: query
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: 페이지 번호
+ *       - name: size
+ *         in: query
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           default: 20
+ *         description: 한 페이지당 항목 수
+ *       - name: sort
+ *         in: query
+ *         required: false
+ *         schema:
+ *           type: string
+ *           enum: [original_name, created_at, download_count]
+ *           default: created_at
+ *         description: 정렬 기준 필드
+ *       - name: order
+ *         in: query
+ *         required: false
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
+ *           default: asc
+ *         description: 정렬 방향 (오름차순/내림차순)
+ *     responses:
+ *       200:
+ *         description: 파일 업로드 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 파일 업로드 성공
+ *       400:
+ *         description: 요청 오류 (파일 또는 디렉토리 ID 누락)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 파일과 디렉토리 아이디는 필수입니다.
+ *       500:
+ *         description: 서버 오류 또는 HLS 변환 실패
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 서버 오류로 파일 업로드 실패
+ */
+router.get("/files", fileInfoController.getFiles);
+
 module.exports = router;

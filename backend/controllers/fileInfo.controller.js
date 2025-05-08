@@ -43,12 +43,13 @@ exports.uploadFile = async (req, res) => {
 
     fs.renameSync(file.path, targetPath);
     let storagePath = targetPath;
+    let thumbPath;
 
     // 1️⃣ 이미지 썸네일 생성
     if (file.mimetype.startsWith("image/")) {
       fs.mkdirSync(THUMBNAIL_DIR, { recursive: true });
 
-      const thumbPath = path.join(THUMBNAIL_DIR, `${uniqueName}`);
+      thumbPath = path.join(THUMBNAIL_DIR, `${uniqueName}`);
       try {
         await sharp(targetPath)
           .resize(200, 200, { fit: "cover" })
@@ -77,8 +78,8 @@ exports.uploadFile = async (req, res) => {
     const insertQuery = `
       INSERT INTO file_info (
         directory_id, file_name, original_name, file_size, mime_type,
-        storage_path, uploader_id, comment, file_hash, media_created_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        storage_path, thumbnail_path, uploader_id, comment, file_hash, media_created_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     await db.execute(insertQuery, [
@@ -88,6 +89,7 @@ exports.uploadFile = async (req, res) => {
       file.size,
       file.mimetype,
       storagePath,
+      thumbPath,
       userId,
       comment || null,
       fileHash,
@@ -98,5 +100,44 @@ exports.uploadFile = async (req, res) => {
   } catch (error) {
     console.error("파일 업로드 실패:", error);
     return res.status(500).json({ message: "서버 오류로 파일 업로드 실패" });
+  }
+};
+
+exports.getFiles = async (req, res) => {
+  const directoryId = Number(req.query.directoryId);
+  const page = Number(req.query.page) || 1;
+  const size = Number(req.query.size) || 20;
+  const sortBy = req.query.sort || "created_at";
+  const order = req.query.order === "desc" ? "DESC" : "ASC";
+  const offset = (page - 1) * size;
+
+  if (!directoryId) {
+    return res.status(400).json({ message: "directoryId가 없습니다." });
+  }
+
+  try {
+    const [files] = await db.execute(
+      `SELECT * FROM file_info WHERE directory_id = ? AND is_deleted = FALSE ORDER BY ${sortBy} ${order} LIMIT ${size} OFFSET ${offset}`,
+      [directoryId]
+    );
+
+    const [[{ count }]] = await db.execute(
+      `SELECT COUNT(*) as count FROM file_info WHERE directory_id = ? AND is_deleted = FALSE`,
+      [directoryId]
+    );
+
+    res.status(200).json({
+      message: "파일 목록 조회 성공",
+      files,
+      pagination: {
+        page: page,
+        size: size,
+        totalCount: count,
+        totalPages: Math.ceil(count / size),
+      },
+    });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ message: "파일 목록 조회 실패" });
   }
 };
