@@ -1,6 +1,6 @@
 import React, { useLayoutEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { useNavigate, useParams } from "react-router";
+import { useLocation, useNavigate, useParams } from "react-router";
 import {
   AccountCircleOutlined,
   AddPhotoAlternateOutlined,
@@ -22,7 +22,9 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { directoryDetailApi } from "@shared/api/directory/[id]/detail/route";
 import { directoryApi } from "@shared/api/directory/[id]/route";
 import { directoryCreateApi } from "@shared/api/directory/create/route";
+import { fileListApi } from "@shared/api/file-info/files/routes";
 import { fileUploadApi } from "@shared/api/file-info/upload/route";
+import { FileListReqDTO } from "@dto/file-info.dto";
 
 const Header = () => {
   const params = useParams<{ directoryId: string }>();
@@ -207,9 +209,35 @@ const CreateNewDirectoryButton = (props: Pick<IconButtonProps, "onClick">) => {
 const FileAddButton = () => {
   const params = useParams<{ directoryId: string }>();
 
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+
   const directoryId = Number(params.directoryId);
+  const fileListPayload: FileListReqDTO = {
+    directoryId,
+    page: Number(searchParams.get("page")) || 0,
+    size: Number(searchParams.get("size")) || 0,
+    sort: searchParams.get("sort") || "created_at",
+    order: searchParams.get("order") || "desc",
+  };
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const { refetch: refetchFileList } = useQuery({
+    queryKey: ["fileList", fileListPayload],
+    queryFn: async () => {
+      const response = await fileListApi.GET(fileListPayload);
+
+      return response;
+    },
+  });
+
+  const { mutate: mutateUpload } = useMutation({
+    mutationFn: fileUploadApi.POST,
+    onSuccess: () => {
+      refetchFileList();
+    },
+  });
 
   return (
     <IconButton
@@ -228,7 +256,7 @@ const FileAddButton = () => {
         onChange={(event) => {
           if (!event.target.files) return;
 
-          fileUploadApi.POST({
+          mutateUpload({
             file: event.target.files[0],
             directoryId,
           });

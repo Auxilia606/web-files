@@ -1,16 +1,27 @@
-import { Link, useParams } from "react-router";
+import { Link, useLocation, useParams } from "react-router";
 import { FolderOutlined } from "@mui/icons-material";
 import { Stack, Typography } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 
 import { directoryDetailApi } from "@shared/api/directory/[id]/detail/route";
 import { directoryApi } from "@shared/api/directory/[id]/route";
+import { fileListApi } from "@shared/api/file-info/files/routes";
 import { UnwrapApiResponse } from "@shared/types";
+import { FileDTO, FileListReqDTO } from "@dto/file-info.dto";
 
 const Explorer = () => {
   const params = useParams<{ directoryId: string }>();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
 
   const directoryId = Number(params.directoryId);
+  const fileListPayload: FileListReqDTO = {
+    directoryId,
+    page: Number(searchParams.get("page")) || 0,
+    size: Number(searchParams.get("size")) || 0,
+    sort: searchParams.get("sort") || "created_at",
+    order: searchParams.get("order") || "desc",
+  };
 
   const { data: directoryDetailData } = useQuery({
     queryKey: ["directory", params.directoryId, "detail"],
@@ -28,6 +39,15 @@ const Explorer = () => {
     enabled: !isNaN(directoryId),
   });
 
+  const { data: fileList } = useQuery({
+    queryKey: ["fileList", fileListPayload],
+    queryFn: async () => {
+      const response = await fileListApi.GET(fileListPayload);
+
+      return response;
+    },
+  });
+
   return (
     <Stack direction="column">
       <DirectoryItem
@@ -37,6 +57,9 @@ const Explorer = () => {
       />
       {directoriesData?.directory.map((v) => (
         <DirectoryItem key={v.id} {...v} />
+      ))}
+      {fileList?.files.map((v) => (
+        <FileItem key={v.id} {...v} />
       ))}
     </Stack>
   );
@@ -68,6 +91,37 @@ const DirectoryItem = (
         <Typography color="textPrimary">{props.directoryName}</Typography>
         <Typography color="textSecondary">
           {props.updatedAt && new Date(props.updatedAt).toLocaleString()}
+        </Typography>
+      </Stack>
+    </Stack>
+  );
+};
+
+type FileItemProps = FileDTO;
+
+const FileItem = (props: FileItemProps) => {
+  return (
+    <Stack
+      component="button"
+      direction="row"
+      height="48px"
+      alignItems="center"
+      justifyContent="flex-start"
+      gap="16px"
+      sx={({ palette }) => ({
+        padding: "0 16px",
+        color: "text.primary",
+        bgcolor: palette.background.default,
+        border: "none",
+        "&:visited": { color: "text.primary" },
+        textAlign: "start",
+      })}
+    >
+      <Stack direction="column" flex="1">
+        <Typography color="textPrimary">{props.original_name}</Typography>
+        <Typography color="textSecondary">
+          {props.media_created_at &&
+            new Date(props.media_created_at).toLocaleString()}
         </Typography>
       </Stack>
     </Stack>

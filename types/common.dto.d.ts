@@ -5,8 +5,10 @@ export type CommonResDTO = {
 export type PagableQueryDTO = {
   page: number;
   size: number;
-  sort: "created_at" | "original_name";
-  order: "asc" | "desc";
+  /** "created_at" | "original_name" */
+  sort: string;
+  /** "asc" | "desc" */
+  order: string;
 };
 
 export type PagableDTO = {

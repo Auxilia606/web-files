@@ -1,6 +1,6 @@
 import { CommonResDTO, PagableDTO, PagableQueryDTO } from "./common.dto";
 
-export type FileListReqDTO = PagableQueryDTO;
+export type FileListReqDTO = PagableQueryDTO & { directoryId: number };
 
 export type FileListResDTO = CommonResDTO &
   PagableDTO & {

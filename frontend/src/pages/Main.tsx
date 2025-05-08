@@ -19,9 +19,7 @@ export default Main;
 
 async function loader() {
   try {
-    console.log("start");
     await authCheckStatusApi.GET();
-    console.log("now?");
     return null;
   } catch {
     return redirect("/login");
