@@ -18,7 +18,7 @@ const GlobalSnackbarProvider = (props: PropsWithChildren) => {
   const [snackbarState, setSnackbarState] = useState<
     SnackbarProps & Pick<AlertProps, "severity">
   >({
-    open: true,
+    open: false,
     slots: { transition: SlideTransition },
     severity: "success",
   });
