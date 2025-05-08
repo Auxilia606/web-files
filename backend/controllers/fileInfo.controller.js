@@ -4,21 +4,11 @@ const crypto = require("crypto");
 const { exec } = require("child_process");
 const sharp = require("sharp"); // ← 추가
 const db = require("../config/db");
-
-const UPLOAD_DIR = path.join(
-  process.env.FILE_LOCATION ?? __dirname,
-  process.env.UPLOAD_LOCATION
-);
-
-const THUMBNAIL_DIR = path.join(
-  process.env.FILE_LOCATION ?? __dirname,
-  process.env.THUMBNAIL_LOCATION
-);
-
-const STREAM_DIR = path.join(
-  process.env.FILE_LOCATION ?? __dirname,
-  process.env.STREAM_LOCATION
-);
+const {
+  UPLOAD_DIR,
+  THUMBNAIL_DIR,
+  STREAM_DIR,
+} = require("../config/file-info");
 
 function convertToHLS(inputPath, outputDir) {
   return new Promise((resolve, reject) => {

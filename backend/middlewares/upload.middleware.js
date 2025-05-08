@@ -3,11 +3,7 @@ const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
 const { v4: uuidv4 } = require("uuid");
-
-const UPLOAD_DIR = path.join(
-  process.env.FILE_LOCATION ?? __dirname,
-  process.env.UPLOAD_LOCATION
-);
+const { UPLOAD_DIR } = require("../config/file-info");
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
