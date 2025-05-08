@@ -2,10 +2,23 @@ const path = require("path");
 const fs = require("fs");
 const crypto = require("crypto");
 const { exec } = require("child_process");
+const sharp = require("sharp"); // ← 추가
 const db = require("../config/db");
 
-const UPLOAD_DIR =
-  process.env.FILE_LOCATION ?? path.join(__dirname, "../uploads");
+const UPLOAD_DIR = path.join(
+  process.env.FILE_LOCATION ?? __dirname,
+  process.env.UPLOAD_LOCATION
+);
+
+const THUMBNAIL_DIR = path.join(
+  process.env.FILE_LOCATION ?? __dirname,
+  process.env.THUMBNAIL_LOCATION
+);
+
+const STREAM_DIR = path.join(
+  process.env.FILE_LOCATION ?? __dirname,
+  process.env.STREAM_LOCATION
+);
 
 function convertToHLS(inputPath, outputDir) {
   return new Promise((resolve, reject) => {
@@ -29,7 +42,6 @@ exports.uploadFile = async (req, res) => {
   }
 
   try {
-    // 해시 생성
     const fileBuffer = fs.readFileSync(file.path);
     const fileHash = crypto
       .createHash("sha256")
@@ -39,26 +51,39 @@ exports.uploadFile = async (req, res) => {
     const uniqueName = req.uniqueFileName;
     const targetPath = path.join(UPLOAD_DIR, uniqueName);
 
-    // 실제 파일 저장
     fs.renameSync(file.path, targetPath);
-
     let storagePath = targetPath;
 
-    // 동영상이면 HLS로 변환
+    // 1️⃣ 이미지 썸네일 생성
+    if (file.mimetype.startsWith("image/")) {
+      fs.mkdirSync(THUMBNAIL_DIR, { recursive: true });
+
+      const thumbPath = path.join(THUMBNAIL_DIR, `${uniqueName}`);
+      try {
+        await sharp(targetPath)
+          .resize(200, 200, { fit: "cover" })
+          .toFile(thumbPath);
+        // 필요 시 thumbPath를 DB에 추가 가능
+      } catch (e) {
+        console.error("썸네일 생성 실패:", e);
+      }
+    }
+
+    // 2️⃣ 동영상 HLS 변환
     if (file.mimetype.startsWith("video/")) {
-      const streamDir = path.join(UPLOAD_DIR, `${uniqueName}_stream`);
-      fs.mkdirSync(streamDir, { recursive: true });
+      const targetStreamDir = path.join(STREAM_DIR, uniqueName);
+      fs.mkdirSync(targetStreamDir, { recursive: true });
 
       try {
-        await convertToHLS(targetPath, streamDir);
-        storagePath = path.join(streamDir, "output.m3u8");
+        await convertToHLS(targetPath, targetStreamDir);
+        storagePath = path.join(targetStreamDir, "output.m3u8");
       } catch (e) {
         console.error("HLS 변환 실패:", e);
         return res.status(500).json({ message: "HLS 변환 실패" });
       }
     }
 
-    // DB 저장
+    // 3️⃣ DB 저장
     const insertQuery = `
       INSERT INTO file_info (
         directory_id, file_name, original_name, file_size, mime_type,

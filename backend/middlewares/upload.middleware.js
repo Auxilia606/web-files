@@ -1,11 +1,21 @@
 // middlewares/upload.middleware.js
 const multer = require("multer");
+const fs = require("fs");
 const path = require("path");
 const { v4: uuidv4 } = require("uuid");
 
+const UPLOAD_DIR = path.join(
+  process.env.FILE_LOCATION ?? __dirname,
+  process.env.UPLOAD_LOCATION
+);
+
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, process.env.FILE_LOCATION);
+    if (!fs.existsSync(UPLOAD_DIR)) {
+      fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+    }
+
+    cb(null, UPLOAD_DIR);
   },
   filename: function (req, file, cb) {
     const ext = path.extname(file.originalname);
