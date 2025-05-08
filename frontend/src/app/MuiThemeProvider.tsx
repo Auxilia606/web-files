@@ -45,6 +45,15 @@ const MuiThemeProvider = (props: PropsWithChildren) => {
               },
             },
           },
+          MuiButton: {
+            styleOverrides: {
+              root: ({ theme }) => ({
+                "&.Mui-disabled": {
+                  color: theme.palette.text.secondary,
+                },
+              }),
+            },
+          },
           MuiIconButton: {
             styleOverrides: {
               root: ({ theme }) => ({

@@ -4,6 +4,7 @@ import React, {
   memo,
   SetStateAction,
   useLayoutEffect,
+  useReducer,
   useRef,
   useState,
 } from "react";
@@ -301,6 +302,7 @@ const FileUploader = (props: FileUploaderProps) => {
     sort: searchParams.get("sort") || "created_at",
     order: searchParams.get("order") || "desc",
   };
+  const [state, dispatch] = useReducer(uploadReducer, initialState);
 
   const { handleOpen } = GlobalSnackbar.use();
 
@@ -314,6 +316,7 @@ const FileUploader = (props: FileUploaderProps) => {
   });
 
   const uploadAll = async () => {
+    dispatch({ type: "START_UPLOAD" });
     for (let i = 0; i < props.files.length; i++) {
       const file = props.files[i];
       await fileUploadApi.POST({ file, directoryId }, (percent) => {
@@ -326,8 +329,10 @@ const FileUploader = (props: FileUploaderProps) => {
     }
 
     handleOpen({ message: `업로드 완료`, severity: "success" });
+    dispatch({ type: "FINISH_UPLOAD" });
     setTimeout(() => {
       props.setOpen(false);
+      dispatch({ type: "RESET" });
     }, 1000);
   };
 
@@ -374,13 +379,47 @@ const FileUploader = (props: FileUploaderProps) => {
           <Button color="warning" onClick={() => props.setOpen(false)}>
             취소
           </Button>
-          <Button color="primary" onClick={uploadAll}>
-            업로드
+          <Button color="primary" onClick={uploadAll} disabled={state.disabled}>
+            {state.buttonLabel}
           </Button>
         </Stack>
       </Stack>
     </Modal>
   );
+};
+
+type UploadStatus = "idle" | "uploading" | "done";
+
+type State = {
+  status: UploadStatus;
+  buttonLabel: string;
+  disabled: boolean;
+};
+
+type Action =
+  | { type: "START_UPLOAD" }
+  | { type: "FINISH_UPLOAD" }
+  | { type: "RESET" };
+const uploadReducer = (state: State, action: Action): State => {
+  switch (action.type) {
+    case "START_UPLOAD":
+      return {
+        status: "uploading",
+        buttonLabel: "업로드 중...",
+        disabled: true,
+      };
+    case "FINISH_UPLOAD":
+      return { status: "done", buttonLabel: "완료", disabled: true };
+    case "RESET":
+      return { status: "idle", buttonLabel: "업로드", disabled: false };
+    default:
+      return state;
+  }
+};
+const initialState: State = {
+  status: "idle",
+  buttonLabel: "업로드",
+  disabled: false,
 };
 
 type UploaderItemProps = {
