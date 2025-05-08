@@ -40,7 +40,7 @@ const LoginPage = () => {
     <Stack flex={1} justifyContent="center" alignItems="center">
       <Stack
         gap="40px"
-        sx={({ breakpoints }) => ({
+        sx={({ breakpoints, palette }) => ({
           borderRadius: "12px",
           boxShadow: "2px 5px 13px 3px rgba(0,0,0,0.25)",
           width: "600px",
@@ -49,6 +49,7 @@ const LoginPage = () => {
             width: "320px",
             padding: "24px",
           },
+          bgcolor: palette.background.paper,
         })}
         component="form"
         onSubmit={handleSubmit((data) => {
