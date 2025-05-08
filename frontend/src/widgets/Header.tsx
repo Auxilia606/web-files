@@ -1,4 +1,12 @@
-import React, { useLayoutEffect, useRef, useState } from "react";
+import React, {
+  Dispatch,
+  Fragment,
+  memo,
+  SetStateAction,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useLocation, useNavigate, useParams } from "react-router";
 import {
@@ -13,12 +21,16 @@ import {
   Drawer,
   IconButton,
   IconButtonProps,
+  LinearProgress,
+  linearProgressClasses,
+  Modal,
   Stack,
   TextField,
   Typography,
 } from "@mui/material";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
+import GlobalSnackbar from "@entities/GlobalSnackbar";
 import { directoryDetailApi } from "@shared/api/directory/[id]/detail/route";
 import { directoryApi } from "@shared/api/directory/[id]/route";
 import { directoryCreateApi } from "@shared/api/directory/create/route";
@@ -209,60 +221,50 @@ const CreateNewDirectoryButton = (props: Pick<IconButtonProps, "onClick">) => {
 const FileAddButton = () => {
   const params = useParams<{ directoryId: string }>();
 
-  const location = useLocation();
-  const searchParams = new URLSearchParams(location.search);
-
   const directoryId = Number(params.directoryId);
-  const fileListPayload: FileListReqDTO = {
-    directoryId,
-    page: Number(searchParams.get("page")) || 0,
-    size: Number(searchParams.get("size")) || 0,
-    sort: searchParams.get("sort") || "created_at",
-    order: searchParams.get("order") || "desc",
-  };
+
+  const [open, setOpen] = useState(false);
+  const [files, setFiles] = useState<File[]>([]);
+  const [progressList, setProgressList] = useState<number[]>([]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const { refetch: refetchFileList } = useQuery({
-    queryKey: ["fileList", fileListPayload],
-    queryFn: async () => {
-      const response = await fileListApi.GET(fileListPayload);
-
-      return response;
-    },
-  });
-
-  const { mutate: mutateUpload } = useMutation({
-    mutationFn: fileUploadApi.POST,
-    onSuccess: () => {
-      refetchFileList();
-    },
-  });
-
   return (
-    <IconButton
-      onClick={() => {
-        fileInputRef.current?.click();
-      }}
-      disabled={!directoryId}
-    >
-      <AddPhotoAlternateOutlined />
-      <input
-        hidden
-        multiple
-        type="file"
-        accept="image/*,video/*"
-        ref={fileInputRef}
-        onChange={(event) => {
-          if (!event.target.files) return;
-
-          mutateUpload({
-            file: event.target.files[0],
-            directoryId,
-          });
+    <Fragment>
+      <IconButton
+        onClick={() => {
+          fileInputRef.current?.click();
         }}
+        disabled={!directoryId}
+      >
+        <AddPhotoAlternateOutlined />
+        <input
+          hidden
+          multiple
+          type="file"
+          accept="image/*,video/*"
+          ref={fileInputRef}
+          onChange={(event) => {
+            if (!event.target.files) return;
+
+            setOpen(true);
+            setFiles([...event.target.files]);
+            setProgressList([...event.target.files].map(() => 0));
+            // mutateUpload({
+            //   file: event.target.files[0],
+            //   directoryId,
+            // });
+          }}
+        />
+      </IconButton>
+      <FileUploader
+        open={open}
+        setOpen={setOpen}
+        files={files}
+        progressList={progressList}
+        setProgressList={setProgressList}
       />
-    </IconButton>
+    </Fragment>
   );
 };
 
@@ -276,5 +278,155 @@ const AccountButton = () => {
     </IconButton>
   );
 };
+
+type FileUploaderProps = {
+  open: boolean;
+  setOpen: Dispatch<SetStateAction<boolean>>;
+  progressList: number[];
+  setProgressList: Dispatch<SetStateAction<number[]>>;
+  files: File[];
+};
+
+const FileUploader = (props: FileUploaderProps) => {
+  const params = useParams<{ directoryId: string }>();
+
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+
+  const directoryId = Number(params.directoryId);
+  const fileListPayload: FileListReqDTO = {
+    directoryId,
+    page: Number(searchParams.get("page")) || 0,
+    size: Number(searchParams.get("size")) || 0,
+    sort: searchParams.get("sort") || "created_at",
+    order: searchParams.get("order") || "desc",
+  };
+
+  const { handleOpen } = GlobalSnackbar.use();
+
+  const { refetch: refetchFileList } = useQuery({
+    queryKey: ["fileList", fileListPayload],
+    queryFn: async () => {
+      const response = await fileListApi.GET(fileListPayload);
+
+      return response;
+    },
+  });
+
+  const uploadAll = async () => {
+    for (let i = 0; i < props.files.length; i++) {
+      const file = props.files[i];
+      await fileUploadApi.POST({ file, directoryId }, (percent) => {
+        props.setProgressList((prev) => {
+          const updated = [...prev];
+          updated[i] = percent;
+          return updated;
+        });
+      });
+    }
+
+    handleOpen({ message: `업로드 완료`, severity: "success" });
+    setTimeout(() => {
+      props.setOpen(false);
+    }, 1000);
+  };
+
+  return (
+    <Modal
+      open={props.open}
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+      onClose={() => {
+        props.setOpen(false);
+        refetchFileList();
+      }}
+    >
+      <Stack
+        direction="column"
+        gap="16px"
+        sx={({ breakpoints, palette }) => ({
+          bgcolor: palette.background.paper,
+          padding: "24px",
+          borderRadius: "12px",
+          [breakpoints.down("sm")]: {
+            alignSelf: "stretch",
+            margin: "16px",
+            padding: "24px",
+            maxHeight: "400px",
+          },
+        })}
+      >
+        <Typography>파일 업로드</Typography>
+        <Stack direction="column" gap="12px">
+          {props.files.map((v, i) => (
+            <UploaderItem
+              key={v.name}
+              file={v}
+              progress={props.progressList[i]}
+            />
+          ))}
+        </Stack>
+        <Stack direction="row" justifyContent="flex-end">
+          <Button color="warning" onClick={() => props.setOpen(false)}>
+            취소
+          </Button>
+          <Button color="primary" onClick={uploadAll}>
+            업로드
+          </Button>
+        </Stack>
+      </Stack>
+    </Modal>
+  );
+};
+
+type UploaderItemProps = {
+  file: File;
+  progress: number;
+};
+
+const UploaderItem = memo((props: UploaderItemProps) => {
+  return (
+    <Stack key={props.file.name} direction="row" alignItems="center" gap="8px">
+      <Stack
+        direction="row"
+        flex="1"
+        justifyContent="space-between"
+        overflow="hidden"
+      >
+        <Typography
+          flex="1 1 0"
+          textOverflow="ellipsis"
+          whiteSpace="nowrap"
+          overflow="hidden"
+        >
+          {props.file.name}
+        </Typography>
+        <Typography flex="0 0 auto">{`${Math.round(
+          props.file.size / 1024
+        ).toLocaleString()}KB`}</Typography>
+      </Stack>
+      <Stack flex="0 0 64px">
+        <LinearProgress
+          variant="determinate"
+          value={props.progress}
+          sx={({ palette }) => ({
+            height: "16px",
+            borderRadius: "16px",
+            border: "1px solid",
+            borderColor: palette.text.secondary,
+            bgcolor: palette.background.paper,
+            [`& .${linearProgressClasses.bar}`]: {
+              borderRadius: "16px",
+            },
+          })}
+        />
+      </Stack>
+    </Stack>
+  );
+});
 
 export default Header;

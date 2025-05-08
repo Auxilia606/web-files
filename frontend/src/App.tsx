@@ -1,6 +1,7 @@
 import MuiThemeProvider from "@app/MuiThemeProvider";
 import ReactQueryProvider from "@app/ReactQueryProvider";
 import RouterProvider from "@app/RouterProvider";
+import GlobalSnackbar from "@entities/GlobalSnackbar";
 import GlobalModal from "@shared/components/GlobalModal";
 
 function App() {
@@ -8,7 +9,9 @@ function App() {
     <ReactQueryProvider>
       <MuiThemeProvider>
         <GlobalModal>
-          <RouterProvider />
+          <GlobalSnackbar>
+            <RouterProvider />
+          </GlobalSnackbar>
         </GlobalModal>
       </MuiThemeProvider>
     </ReactQueryProvider>
