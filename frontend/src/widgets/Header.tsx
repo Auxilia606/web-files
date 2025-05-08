@@ -92,7 +92,15 @@ const Header = () => {
   }, [directoryId]);
 
   return (
-    <Stack direction="column">
+    <Stack
+      direction="column"
+      position="sticky"
+      top="0"
+      sx={({ palette }) => ({
+        bgcolor: palette.background.default,
+        paddingBottom: "8px",
+      })}
+    >
       <Stack
         direction="row"
         alignItems="center"

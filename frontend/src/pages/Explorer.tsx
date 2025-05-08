@@ -78,7 +78,7 @@ const DirectoryItem = (
   return (
     <Stack
       direction="row"
-      height="48px"
+      height="64px"
       alignItems="center"
       gap="16px"
       sx={{
@@ -111,7 +111,7 @@ const FileItem = (props: FileItemProps) => {
     <Stack
       component="button"
       direction="row"
-      height="48px"
+      height="64px"
       alignItems="center"
       justifyContent="flex-start"
       gap="16px"
@@ -122,12 +122,15 @@ const FileItem = (props: FileItemProps) => {
         border: "none",
         "&:visited": { color: "text.primary" },
         textAlign: "start",
+        img: {
+          borderRadius: "8px",
+        },
       })}
     >
       <img
         src={`/api/file-info/thumbnail/${props.id}`}
-        width={40}
-        height={40}
+        width={48}
+        height={48}
       />
       <Stack direction="column" flex="1">
         <Typography color="textPrimary">{props.original_name}</Typography>
